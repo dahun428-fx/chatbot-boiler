@@ -1,9 +1,21 @@
-// app/ui/ModalOutlet.tsx
+/**
+ * Modal Outlet
+ *
+ * 모달을 렌더링하는 포털 컴포넌트입니다.
+ * 필요한 모달을 switch case에 추가하여 사용하세요.
+ */
 import { memo, Suspense, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { useRecoilState } from 'recoil';
+import { atom, useRecoilState } from 'recoil';
 
-import { activeModalState } from '@/features/chat/atom/modal';
+/** 활성화된 모달 타입 */
+export type ModalType = null; // 필요한 모달 타입 추가
+
+/** 모달 상태 atom */
+export const activeModalState = atom<ModalType>({
+  key: 'activeModalState',
+  default: null,
+});
 
 // 모달 포털 대상 보장
 function useModalRoot() {
@@ -29,6 +41,8 @@ const ModalOutlet = memo(function ModalOutlet() {
   const ActiveModal = useMemo(() => {
     switch (activeModal) {
       // 필요한 모달 추가
+      // case 'example':
+      //   return <ExampleModal onClose={handleClose} />;
       default:
         return null;
     }

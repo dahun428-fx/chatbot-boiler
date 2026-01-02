@@ -11,16 +11,22 @@ import type { ChatService, ServiceConfig, ServiceType } from './types';
 /**
  * 환경변수에서 설정 로드
  */
-const loadConfig = (): ServiceConfig => ({
-    type: (import.meta.env.VITE_CHAT_SERVICE_TYPE || 'BackendAPI') as ServiceType,
-    streaming: import.meta.env.VITE_STREAMING_MODE === 'true',
-    timeout: Number(import.meta.env.VITE_API_TIMEOUT_MS) || 30000,
-    systemPrompt: import.meta.env.VITE_SYSTEM_PROMPT || undefined,
-    backendUrl: import.meta.env.VITE_BACKEND_API_URL || undefined,
-    llmProvider: import.meta.env.VITE_LLM_PROVIDER || 'openai',
-    llmApiKey: import.meta.env.VITE_LLM_API_KEY || undefined,
-    llmModel: import.meta.env.VITE_LLM_MODEL || undefined,
-});
+const loadConfig = (): ServiceConfig => {
+    const useProxy = import.meta.env.VITE_LLM_USE_PROXY === 'true';
+    const config = {
+        type: (import.meta.env.VITE_CHAT_SERVICE_TYPE || 'BackendAPI') as ServiceType,
+        streaming: import.meta.env.VITE_STREAMING_MODE === 'true',
+        timeout: Number(import.meta.env.VITE_API_TIMEOUT_MS) || 30000,
+        systemPrompt: import.meta.env.VITE_SYSTEM_PROMPT || undefined,
+        backendUrl: import.meta.env.VITE_BACKEND_API_URL || undefined,
+        llmProvider: import.meta.env.VITE_LLM_PROVIDER || 'openai',
+        llmApiKey: useProxy ? 'proxy' : (import.meta.env.VITE_LLM_API_KEY || undefined),
+        llmModel: import.meta.env.VITE_LLM_MODEL || undefined,
+        llmUseProxy: useProxy,
+    };
+    console.log('[ChatService] loadConfig:', { llmModel: config.llmModel, llmProvider: config.llmProvider, useProxy });
+    return config;
+};
 
 /**
  * 서비스 팩토리 레지스트리

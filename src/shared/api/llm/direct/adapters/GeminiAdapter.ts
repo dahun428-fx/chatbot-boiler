@@ -35,8 +35,10 @@ export class GeminiAdapter implements LLMAdapter {
 
     async chat(request: LLMRequest): Promise<LLMResponse> {
         const model = request.model || this.config.defaultModel;
-        const url =
-            this.config.baseUrl || `${GEMINI_API_BASE}/${model}:generateContent?key=${this.config.apiKey}`;
+        // baseUrl이 있으면 프록시 사용 (API Key는 서버에서 주입)
+        const url = this.config.baseUrl
+            ? `${this.config.baseUrl}/${model}:generateContent`
+            : `${GEMINI_API_BASE}/${model}:generateContent?key=${this.config.apiKey}`;
 
         const { systemInstruction, contents } = this.convertMessages(request.messages);
 
@@ -80,9 +82,10 @@ export class GeminiAdapter implements LLMAdapter {
 
     async *stream(request: LLMRequest): AsyncGenerator<LLMStreamChunk, void, unknown> {
         const model = request.model || this.config.defaultModel;
-        const url =
-            this.config.baseUrl ||
-            `${GEMINI_API_BASE}/${model}:streamGenerateContent?alt=sse&key=${this.config.apiKey}`;
+        // baseUrl이 있으면 프록시 사용 (API Key는 서버에서 주입)
+        const url = this.config.baseUrl
+            ? `${this.config.baseUrl}/${model}:streamGenerateContent?alt=sse`
+            : `${GEMINI_API_BASE}/${model}:streamGenerateContent?alt=sse&key=${this.config.apiKey}`;
 
         const { systemInstruction, contents } = this.convertMessages(request.messages);
 

@@ -30,6 +30,51 @@ export default defineConfig(({ mode }) => {
     };
   }
 
+  // LLM API 프록시 설정 (API Key 숨김)
+  const llmProvider = env.VITE_LLM_PROVIDER;
+  const llmApiKey = env.LLM_API_KEY; // VITE_ 접두사 없음 - 서버에서만 사용
+
+  if (llmProvider === 'gemini' && llmApiKey) {
+    proxy['/llm-proxy/gemini'] = {
+      target: 'https://generativelanguage.googleapis.com',
+      changeOrigin: true,
+      rewrite: (path) => {
+        // /llm-proxy/gemini/v1beta/models/... -> /v1beta/models/...?key=API_KEY
+        const newPath = path.replace('/llm-proxy/gemini', '');
+        return newPath.includes('?')
+          ? `${newPath}&key=${llmApiKey}`
+          : `${newPath}?key=${llmApiKey}`;
+      },
+    };
+  }
+
+  if (llmProvider === 'openai' && llmApiKey) {
+    proxy['/llm-proxy/openai'] = {
+      target: 'https://api.openai.com',
+      changeOrigin: true,
+      rewrite: (path) => path.replace('/llm-proxy/openai', ''),
+      configure: (proxy) => {
+        proxy.on('proxyReq', (proxyReq) => {
+          proxyReq.setHeader('Authorization', `Bearer ${llmApiKey}`);
+        });
+      },
+    };
+  }
+
+  if (llmProvider === 'anthropic' && llmApiKey) {
+    proxy['/llm-proxy/anthropic'] = {
+      target: 'https://api.anthropic.com',
+      changeOrigin: true,
+      rewrite: (path) => path.replace('/llm-proxy/anthropic', ''),
+      configure: (proxy) => {
+        proxy.on('proxyReq', (proxyReq) => {
+          proxyReq.setHeader('x-api-key', llmApiKey);
+          proxyReq.setHeader('anthropic-version', '2023-06-01');
+        });
+      },
+    };
+  }
+
   const config = {
     base: BASE,
     build: {

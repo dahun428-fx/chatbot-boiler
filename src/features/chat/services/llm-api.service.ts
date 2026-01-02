@@ -24,14 +24,25 @@ export class LLMAPIService implements ChatService {
      */
     private getLLM(): LLMAdapter {
         if (!this.llm) {
-            if (!this.config.llmApiKey) {
+            if (!this.config.llmApiKey && !this.config.llmUseProxy) {
                 throw new Error('LLM API 키가 설정되지 않았습니다.');
             }
 
+            // 프록시 사용 시 baseUrl 설정
+            const proxyBaseUrls: Record<string, string> = {
+                gemini: '/llm-proxy/gemini/v1beta/models',
+                openai: '/llm-proxy/openai/v1',
+                anthropic: '/llm-proxy/anthropic/v1',
+            };
+
+            const provider = (this.config.llmProvider || 'openai') as 'openai' | 'anthropic' | 'gemini';
+            const baseUrl = this.config.llmUseProxy ? proxyBaseUrls[provider] : undefined;
+
             this.llm = createLLM({
-                type: (this.config.llmProvider || 'openai') as 'openai' | 'anthropic' | 'gemini',
-                apiKey: this.config.llmApiKey,
+                type: provider,
+                apiKey: this.config.llmUseProxy ? 'proxy' : this.config.llmApiKey!,
                 defaultModel: this.config.llmModel,
+                baseUrl,
             });
         }
         return this.llm;

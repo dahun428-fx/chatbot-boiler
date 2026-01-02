@@ -77,4 +77,6 @@ export interface ServiceConfig {
     llmApiKey?: string;
     /** LLM Model (LLMAPI용) */
     llmModel?: string;
+    /** LLM 프록시 사용 여부 (API Key 숨김) */
+    llmUseProxy?: boolean;
 }

@@ -10,13 +10,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 import { useChat, useChatActions, useChatState } from '@/features/chat/hooks';
 import * as servicesModule from '@/features/chat/services';
-import type { ChatService, StreamChunk } from '@/features/chat/services/types';
-import type { Message } from '@/features/chat/types/message';
-
-// ChatService 모킹
-const createMockChatService = (): ChatService => ({
-    sendMessage: vi.fn(),
-});
 
 // chatService 모킹
 vi.mock('@/features/chat/services', async () => {

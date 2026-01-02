@@ -41,3 +41,39 @@ export function safeParseJSON(text?: string | object | null) {
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+/**
+ * 마크다운 텍스트의 줄바꿈을 정규화합니다.
+ * - JSON 문자열 파싱
+ * - 이스케이프 복원 (\n, \")
+ * - CRLF -> LF 변환
+ * - 과도한 개행 정리
+ * - blockquote 내 리스트 변환
+ */
+export function replaceNewlineWithBr(text: string): string {
+  if (!text) return '';
+
+  let s = text;
+
+  // 1) 따옴표로 감싼 JSON 문자열이면 파싱해서 내부 이스케이프를 복원
+  const t = s.trim();
+  if ((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'"))) {
+    try {
+      s = JSON.parse(t);
+    } catch {
+      // 무시
+    }
+  }
+
+  s = s
+    .replace(/\\"/g, '"') // \" -> "
+    .replace(/\r\n/g, '\n') // CRLF → LF
+    .replace(/\\n/g, '\n') // 문자열 "\n" → 실제 개행
+    .replace(/\n{2,}/g, '\n\n') // 과도 개행 정리
+    .replace(/~/g, '-');
+
+  // blockquote 안의 리스트를 중첩 리스트로 변환
+  s = s.replace(/^\s*>\s*-\s+/gm, '  - ').replace(/^\s*>\s*(\d+)\.\s+/gm, '  $1. ');
+
+  return s;
+}

@@ -16,6 +16,9 @@ export { ErrorDisplay } from './ErrorDisplay';
 // 날짜 구분선
 export { DateDivider } from './DateDivider';
 
+// 메시지 버블 래퍼
+export { MessageBubbleWrapper } from './MessageBubbleWrapper';
+
 // 메시지 컴포넌트 (새로운 구조)
 export {
     UserMessage,

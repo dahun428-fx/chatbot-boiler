@@ -1,14 +1,22 @@
 /**
  * 채팅 메시지 컴포넌트
+ *
+ * - 마크다운 지원 (MarkdownContent)
+ * - 스트리밍 애니메이션 (StreamingText)
+ * - 로고 ↔ 로딩 아이콘 토글
+ * - MessageBubbleWrapper로 일관된 구조
  */
 import { memo } from 'react';
 
-import type { LLMMessage } from '@/shared/api/llm/direct/types';
+import { useStreamingAnimation } from '@/shared/context/StreamingAnimationContext';
 import { cn } from '@/shared/lib/common';
+import MarkdownContent from '@/shared/ui/MarkdownContent';
+import { StreamingText } from '@/shared/ui/StreamingText';
 
 import type { Message } from '../types/message';
 
 import { DateDivider } from './DateDivider';
+import { MessageBubbleWrapper } from './MessageBubbleWrapper';
 
 // 봇 로고 아이콘 컴포넌트 (my-health-ai-coach-web 원본)
 const BotLogo = () => (
@@ -98,35 +106,35 @@ export const ChatMessage = memo(function ChatMessage({ message }: ChatMessagePro
     if (isUser) {
         // 사용자 메시지 - 우측 정렬, 회색 배경
         return (
-            <div className="flex w-full justify-end">
-                <div
-                    className={cn(
-                        'max-w-[80%] whitespace-pre-wrap break-all',
-                        'rounded-bl-2xl rounded-br-[4px] rounded-t-2xl',
-                        'bg-gray-50 text-gray-900',
-                        'py-3 px-5'
-                    )}
-                >
-                    <p className="text-[16px] leading-relaxed">
-                        {message.content}
-                    </p>
+            <MessageBubbleWrapper id={message.id}>
+                <div className="flex w-full justify-end">
+                    <div
+                        className={cn(
+                            'max-w-[80%] whitespace-pre-wrap break-all',
+                            'rounded-bl-2xl rounded-br-[4px] rounded-t-2xl',
+                            'bg-gray-50 text-gray-900',
+                            'py-3 px-5'
+                        )}
+                    >
+                        <p className="text-[16px] leading-relaxed">{message.content}</p>
+                    </div>
                 </div>
-            </div>
+            </MessageBubbleWrapper>
         );
     }
 
-    // 봇 메시지 - 좌측 정렬, 로고 + 배경 없음
+    // 봇 메시지 - 좌측 정렬, 로고 + 마크다운
     return (
-        <div className="flex w-full justify-start">
-            <div className="max-w-[80%]">
-                <BotLogo />
-                <div className="pb-3 pt-1 text-gray-800">
-                    <p className="whitespace-pre-wrap text-[16px] leading-relaxed">
-                        {message.content}
-                    </p>
+        <MessageBubbleWrapper id={message.id}>
+            <div className="flex w-full justify-start">
+                <div className="max-w-[80%]">
+                    <BotLogo />
+                    <div className="pb-3 pt-1 text-gray-800">
+                        <MarkdownContent markdownContent={message.content} />
+                    </div>
                 </div>
             </div>
-        </div>
+        </MessageBubbleWrapper>
     );
 });
 
@@ -141,6 +149,9 @@ export const ChatMessageList = memo(function ChatMessageList({
     streamingMessage,
     isLoading,
 }: ChatMessageListProps) {
+    const { animationType } = useStreamingAnimation();
+    const isStreaming = !!streamingMessage;
+
     return (
         <div className="flex flex-col gap-4">
             {messages.map((message, index) => {
@@ -153,27 +164,37 @@ export const ChatMessageList = memo(function ChatMessageList({
                 );
             })}
 
-            {/* 스트리밍 중인 메시지 */}
-            {streamingMessage && (
-                <div className="flex w-full justify-start">
-                    <div className="max-w-[80%]">
-                        <LoadingIcon />
-                        <div className="pb-3 pt-1 text-gray-800">
-                            <p className="whitespace-pre-wrap text-[16px] leading-relaxed">
-                                {streamingMessage}
-                            </p>
+            {/* 스트리밍 중인 메시지 - 로딩 아이콘 + fade-in 애니메이션 */}
+            {isStreaming && (
+                <MessageBubbleWrapper id="streaming">
+                    <div className="flex w-full justify-start">
+                        <div className="max-w-[80%]">
+                            {/* 스트리밍 중에는 로딩 아이콘, 완료 시 로고 */}
+                            <LoadingIcon />
+                            <div className="pb-3 pt-1 text-gray-800">
+                                {animationType === 'fade-in' ? (
+                                    <StreamingText
+                                        text={streamingMessage}
+                                        className="prose max-w-none text-[16px]"
+                                    />
+                                ) : (
+                                    <MarkdownContent markdownContent={streamingMessage} />
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
+                </MessageBubbleWrapper>
             )}
 
-            {/* 로딩 인디케이터 */}
-            {isLoading && !streamingMessage && (
-                <div className="flex w-full justify-start">
-                    <div>
-                        <LoadingIcon />
+            {/* 로딩 인디케이터 (스트리밍 시작 전) */}
+            {isLoading && !isStreaming && (
+                <MessageBubbleWrapper id="loading">
+                    <div className="flex w-full justify-start">
+                        <div>
+                            <LoadingIcon />
+                        </div>
                     </div>
-                </div>
+                </MessageBubbleWrapper>
             )}
         </div>
     );

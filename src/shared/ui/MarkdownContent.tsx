@@ -4,7 +4,7 @@ import rehypeRaw from 'rehype-raw';
 import remakrBreak from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
 
-import { cn } from '@/shared/lib/common';
+import { cn, replaceNewlineWithBr } from '@/shared/lib/common';
 
 import IntrinsicElements = React.JSX.IntrinsicElements;
 
@@ -78,6 +78,8 @@ const markdownComponents = {
 };
 
 const MarkdownContent: React.FC<TMarkdownContentProps> = ({ markdownContent, className }) => {
+  const processedContent = replaceNewlineWithBr(markdownContent);
+
   return (
     <div className={cn('text-left', className)}>
       <Markdown
@@ -86,7 +88,7 @@ const MarkdownContent: React.FC<TMarkdownContentProps> = ({ markdownContent, cla
         remarkPlugins={[remarkGfm, remakrBreak]}
         className={cn('prose max-w-none break-keep text-[16px]')}
       >
-        {markdownContent}
+        {processedContent}
       </Markdown>
     </div>
   );

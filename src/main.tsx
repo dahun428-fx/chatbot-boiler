@@ -10,6 +10,7 @@ import { RecoilRoot } from 'recoil';
 import 'react-toastify/dist/ReactToastify.css';
 import '@/styles/globals.css';
 import { routeTree } from './routeTree.gen';
+import { StreamingAnimationProvider } from './shared/context/StreamingAnimationContext';
 import { LoadingOverlay } from './shared/ui/basic/LoadingOverlay';
 import { StyledToastContainer } from './shared/ui/StyledToastContainer';
 
@@ -47,9 +48,11 @@ createRoot(document.getElementById('root')!).render(
     <RecoilRoot>
       <HeroUIProvider>
         <QueryClientProvider client={queryClient}>
-          <Suspense fallback={<LoadingOverlay isLoading={true} />}>
-            <App />
-          </Suspense>
+          <StreamingAnimationProvider initialType="fade-in" initialDuration={600}>
+            <Suspense fallback={<LoadingOverlay isLoading={true} />}>
+              <App />
+            </Suspense>
+          </StreamingAnimationProvider>
         </QueryClientProvider>
       </HeroUIProvider>
     </RecoilRoot>

@@ -97,6 +97,9 @@ export const ChatInput = memo(function ChatInput({
 
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+            // 한글 등 IME 조합 중이면 무시
+            if (e.nativeEvent.isComposing) return;
+
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 handleSubmit();

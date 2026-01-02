@@ -2,10 +2,21 @@
 import { useCallback } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
+import camelcaseKeys from 'camelcase-keys';
 
 import { GetUserChatRoomSummariesResponse } from '@/entities/chat/api/GetUserChatRoomSummariesResponse';
-import { apiCaller } from '@/shared/api';
-import { ApiBody } from '@/shared/api/api.types';
+import { HttpClient } from '@/shared/api/http';
+
+const chatApi = new HttpClient({
+  baseUrl: '/api',
+  headers: {
+    'user-token': sessionStorage.getItem('userToken') ?? '',
+  },
+  onResponse: async (response) => ({
+    ...response,
+    data: camelcaseKeys(response.data as Record<string, unknown>, { deep: true }),
+  }),
+});
 
 interface InfiniteChatResponse extends GetUserChatRoomSummariesResponse {
   nextPage?: number;
@@ -25,9 +36,7 @@ export function useChatHistory(options?: { enabled?: boolean }) {
       // --- 의도적 딜레이 (예: 800ms) ---
       // await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      return apiCaller('getUserChatRoomSummaries', undefined, {
-        pagination: pageParam,
-      } as ApiBody<'getUserChatRoomSummaries'>) as Promise<InfiniteChatResponse>;
+      return chatApi.post<InfiniteChatResponse>('', { pagination: pageParam }, { params: { job: 'getUserChatRoomSummaries' } });
     },
 
     // 페이징 설정

@@ -1,7 +1,7 @@
 import camelcaseKeys from 'camelcase-keys';
 import dayjs from 'dayjs';
 
-import { httpClient } from '@/shared/api/httpRequest';
+import { HttpClient } from '@/shared/api/http';
 
 import type {
     MessageReturnType,
@@ -10,6 +10,15 @@ import type {
 } from '../types/message-input.types';
 
 import { MESSAGE_CONFIG } from './constants';
+
+// Chat Direct API 클라이언트
+const chatDirectApi = new HttpClient({
+    baseUrl: import.meta.env.VITE_CHAT_DIRECT_URL ?? '/api/chat',
+    headers: {
+        'user-token': sessionStorage.getItem('userToken') ?? '',
+    },
+    timeout: MESSAGE_CONFIG.TIMEOUT_MS,
+});
 
 /**
  * 채팅 메시지를 서버에 전송하고 응답을 받습니다.
@@ -22,19 +31,16 @@ export async function sendChatMessage(
     params: SendChatMessageParams,
     signal: AbortSignal
 ): Promise<MessageReturnType> {
-    const rawRes = await httpClient<SnakeCaseMessageReturnType>({
-        url: '',
-        signal,
-        timeoutMs: MESSAGE_CONFIG.TIMEOUT_MS,
-        method: 'POST',
-        instanceType: 'chatDirect',
-        body: {
+    const rawRes = await chatDirectApi.post<SnakeCaseMessageReturnType>(
+        '',
+        {
             chatRoomId: params.chatRoomId,
             msgTimestamp: params.msgTimestamp,
             msgTypeCd: params.msgTypeCd,
             msgDc: params.msgDc,
         },
-    });
+        { signal }
+    );
 
     return camelcaseKeys(rawRes, { deep: true }) as MessageReturnType;
 }

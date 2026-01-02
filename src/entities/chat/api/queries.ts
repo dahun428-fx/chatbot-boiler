@@ -1,7 +1,7 @@
 import { DefaultError, useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
+import camelcaseKeys from 'camelcase-keys';
 
-import { apiCaller } from '@/shared/api';
-import { ApiBody } from '@/shared/api/api.types';
+import { HttpClient } from '@/shared/api/http';
 
 import { GetChatRoomHistoryRequest } from './GetChatRoomHistoryRequest';
 import { GetChatRoomHistoryResponse } from './GetChatRoomHistoryResponse';
@@ -9,6 +9,18 @@ import { GetUserChatRoomSummariesRequest } from './GetUserChatRoomSummariesReque
 import { GetUserChatRoomSummariesResponse } from './GetUserChatRoomSummariesResponse';
 import { OpenToAIChatroomRequest } from './OpenToAIChatroomRequest';
 import { OpenToAIChatroomResponse } from './OpenToAIChatroomResponse';
+
+// Chat API HTTP 클라이언트
+const chatApi = new HttpClient({
+  baseUrl: '/api',
+  headers: {
+    'user-token': sessionStorage.getItem('userToken') ?? '',
+  },
+  onResponse: async (response) => ({
+    ...response,
+    data: camelcaseKeys(response.data as Record<string, unknown>, { deep: true }),
+  }),
+});
 
 /**
  * 채팅 관련 React Query 키 정의
@@ -37,23 +49,21 @@ const queries = {
   /** AI 챗룸 개설 요청 */
   openToAIChatroom: (params: OpenToAIChatroomRequest) => ({
     queryKey: CHAT_QUERY_KEY.OPEN_TO_AICHAT_ROOM(params),
-    queryFn: () => apiCaller('openToAIChatroom'),
+    queryFn: () => chatApi.get<OpenToAIChatroomResponse>('', { params: { job: 'openToAIChatroom' } }),
   }),
 
   /** 특정 챗룸 대화 내역 조회 */
   getChatRoomHistory: (params: GetChatRoomHistoryRequest) => ({
     queryKey: CHAT_QUERY_KEY.GET_CHAT_HISTORY(params),
     queryFn: () =>
-      apiCaller('getChatRoomHistory', { queryParams: { chatRoomId: params.chatRoomId } }),
+      chatApi.post<GetChatRoomHistoryResponse>('', { chatRoomId: params.chatRoomId }, { params: { job: 'getChatRoomHistory' } }),
   }),
 
   /** 사용자 챗룸 요약 목록 조회 */
   getUserChatRoomSummaries: (params: GetUserChatRoomSummariesRequest) => ({
     queryKey: CHAT_QUERY_KEY.GET_USER_CHAT_ROOM_SUMMARIES(params),
     queryFn: () =>
-      apiCaller('getUserChatRoomSummaries', undefined, {
-        pagination: params.pagination ?? 0,
-      } as ApiBody<'getUserChatRoomSummaries'>),
+      chatApi.post<GetUserChatRoomSummariesResponse>('', { pagination: params.pagination ?? 0 }, { params: { job: 'getUserChatRoomSummaries' } }),
   }),
 };
 
@@ -90,9 +100,7 @@ export const useGetChatRoomHistory = <TData = GetChatRoomHistoryResponse>(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return { items: [] } as any;
       }
-      return apiCaller('getChatRoomHistory', undefined, {
-        chatRoomId: params.chatRoomId,
-      } as ApiBody<'getChatRoomHistory'>);
+      return chatApi.post<GetChatRoomHistoryResponse>('', { chatRoomId: params.chatRoomId }, { params: { job: 'getChatRoomHistory' } });
     },
     enabled: Boolean(params.chatRoomId),
     ...options,
@@ -121,7 +129,5 @@ export const useGetUserChatRoomSummaries = <TData = GetUserChatRoomSummariesResp
 export const fetchChatRoomHistoryRaw = async (
   chatRoomId: string
 ): Promise<GetChatRoomHistoryResponse> => {
-  return apiCaller('getChatRoomHistory', undefined, {
-    chatRoomId,
-  } as ApiBody<'getChatRoomHistory'>);
+  return chatApi.post<GetChatRoomHistoryResponse>('', { chatRoomId }, { params: { job: 'getChatRoomHistory' } });
 };

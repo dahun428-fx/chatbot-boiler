@@ -1,4 +1,4 @@
-import { ApiBasicResponse } from '@/shared/api/api.types';
+import { ApiBasicResponse } from '@/shared/api/types';
 import { MessageForHistorySummary } from '@/shared/types/message.type';
 
 /* eslint-disable @typescript-eslint/no-empty-interface, @typescript-eslint/no-empty-object-type */

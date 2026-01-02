@@ -1,4 +1,4 @@
-import { ApiBasicResponse } from '@/shared/api/api.types';
+import { ApiBasicResponse } from '@/shared/api/types';
 
 /* eslint-disable @typescript-eslint/no-empty-interface, @typescript-eslint/no-empty-object-type */
 

@@ -1,10 +1,21 @@
 // src/features/chat/hooks/use-undo-delete.ts
 import { useCallback, useState } from 'react';
+import camelcaseKeys from 'camelcase-keys';
 
 import { useTrack } from '@/lib/analystics/useTrack';
-import { apiCaller } from '@/shared/api';
-import { ApiBody } from '@/shared/api/api.types';
+import { HttpClient } from '@/shared/api/http';
 import { showUndoToast } from '@/shared/ui/basic/toast/showUndoToast';
+
+const chatApi = new HttpClient({
+  baseUrl: '/api',
+  headers: {
+    'user-token': sessionStorage.getItem('userToken') ?? '',
+  },
+  onResponse: async (response) => ({
+    ...response,
+    data: camelcaseKeys(response.data as Record<string, unknown>, { deep: true }),
+  }),
+});
 
 type UseUndoDeleteOptions = {
   toastContainerId?: string; // StyledToastContainer의 containerId
@@ -44,9 +55,7 @@ export function useUndoDelete(opts: UseUndoDeleteOptions = {}) {
         onExpire: async () => {
           try {
             // 실제 삭제 확정
-            await apiCaller('deleteChatSession', undefined, {
-              chatRoomId,
-            } as ApiBody<'deleteChatSession'>);
+            await chatApi.post('', { chatRoomId }, { params: { job: 'deleteChatSession' } });
 
             // posthog
             track('chat_room_delete', {

@@ -1,133 +1,67 @@
 /**
- * LLM Provider Abstraction Layer
+ * LLM Module
  *
- * 다양한 LLM 제공자(OpenAI, Anthropic 등)를 동일한 인터페이스로 사용할 수 있게 해주는 추상화 레이어입니다.
+ * LLM 연결을 위한 두 가지 방식을 제공합니다:
+ *
+ * 1. **Server** - 자체 백엔드 서버 경유 (SSE/API 모드)
+ * 2. **Direct** - LLM API 직접 연결 (OpenAI, Claude, Gemini, Custom)
  *
  * @example
  * ```typescript
- * import { createLLMProvider, OpenAIAdapter } from '@/shared/api/llm';
+ * // 1. 자체 서버 경유 (SSE 모드)
+ * import { LLMServerClient } from '@/shared/api/llm/server';
  *
- * // 환경변수로 자동 설정
- * const provider = createLLMProvider();
- *
- * // 또는 직접 어댑터 생성
- * const openai = new OpenAIAdapter({
- *   apiKey: 'sk-...',
- *   defaultModel: 'gpt-4o',
+ * const serverClient = new LLMServerClient({
+ *   baseUrl: '/api/llm',
+ *   streamEndpoint: '/chat/stream',
  * });
  *
- * // 일반 채팅
- * const response = await provider.chat({
- *   messages: [{ role: 'user', content: 'Hello!' }],
- * });
- *
- * // 스트리밍
- * for await (const chunk of provider.stream({ messages })) {
+ * for await (const chunk of serverClient.stream({ messages })) {
  *   console.log(chunk.content);
  * }
- * ```
- */
-
-// Types
-export type {
-    LLMAdapter,
-    LLMMessage,
-    LLMProviderConfig,
-    LLMRequest,
-    LLMResponse,
-    LLMStreamChunk,
-} from './types';
-
-export { LLMError } from './types';
-
-// SSE Client
-export { createRetryableSSEStream, createSSEStream, parseSSEEvent } from './SSEClient';
-
-// Adapters
-export { AnthropicAdapter } from './adapters/AnthropicAdapter';
-export { CustomAdapter } from './adapters/CustomAdapter';
-export { OpenAIAdapter } from './adapters/OpenAIAdapter';
-
-// Provider Factory
-import type { LLMAdapter, LLMProviderConfig } from './types';
-import { AnthropicAdapter } from './adapters/AnthropicAdapter';
-import { CustomAdapter } from './adapters/CustomAdapter';
-import { OpenAIAdapter } from './adapters/OpenAIAdapter';
-
-export type LLMProviderType = 'openai' | 'anthropic' | 'custom';
-
-interface CreateLLMProviderOptions extends LLMProviderConfig {
-    /** LLM 제공자 타입 */
-    type?: LLMProviderType;
-    /** Custom provider의 경우 사용할 엔드포인트 경로 */
-    chatEndpoint?: string;
-    streamEndpoint?: string;
-    additionalHeaders?: Record<string, string>;
-}
-
-/**
- * LLM Provider 팩토리 함수
  *
- * 환경변수 또는 옵션을 기반으로 적절한 LLM 어댑터를 생성합니다.
+ * // 2. LLM API 직접 연결
+ * import { createLLM } from '@/shared/api/llm/direct';
  *
- * @example
- * ```typescript
- * // 환경변수 사용 (VITE_LLM_PROVIDER, VITE_LLM_API_KEY, VITE_LLM_MODEL)
- * const provider = createLLMProvider();
- *
- * // 직접 설정
- * const provider = createLLMProvider({
+ * const llm = createLLM({
  *   type: 'openai',
  *   apiKey: 'sk-...',
- *   defaultModel: 'gpt-4o',
  * });
+ *
+ * const response = await llm.chat({ messages });
  * ```
  */
-export function createLLMProvider(options?: CreateLLMProviderOptions): LLMAdapter {
-    const type = options?.type || (import.meta.env.VITE_LLM_PROVIDER as LLMProviderType) || 'openai';
-    const apiKey = options?.apiKey || import.meta.env.VITE_LLM_API_KEY || '';
-    const defaultModel = options?.defaultModel || import.meta.env.VITE_LLM_MODEL || undefined;
-    const baseUrl = options?.baseUrl || import.meta.env.VITE_LLM_BASE_URL || undefined;
 
-    const config: LLMProviderConfig = {
-        apiKey,
-        defaultModel,
-        baseUrl,
-    };
+// ============ Server (자체 백엔드 경유) ============
+export { createLLMServerClient, LLMServerClient } from './server';
+export type {
+    ChatOptions,
+    ChatRequest,
+    ChatResponse,
+    LLMServerConfig,
+    Message,
+    MessageRole,
+    StreamChunk,
+} from './server';
 
-    switch (type) {
-        case 'openai':
-            return new OpenAIAdapter(config);
-
-        case 'anthropic':
-            return new AnthropicAdapter(config);
-
-        case 'custom':
-            return new CustomAdapter({
-                ...config,
-                chatEndpoint: options?.chatEndpoint,
-                streamEndpoint: options?.streamEndpoint,
-                additionalHeaders: options?.additionalHeaders,
-            });
-
-        default:
-            throw new Error(`Unknown LLM provider type: ${type}`);
-    }
-}
-
-/**
- * LLM Provider 인스턴스를 생성하고 반환하는 싱글톤 패턴
- * React 외부에서 사용할 때 유용합니다.
- */
-let defaultProvider: LLMAdapter | null = null;
-
-export function getLLMProvider(): LLMAdapter {
-    if (!defaultProvider) {
-        defaultProvider = createLLMProvider();
-    }
-    return defaultProvider;
-}
-
-export function resetLLMProvider(): void {
-    defaultProvider = null;
-}
+// ============ Direct (LLM API 직접 연결) ============
+export {
+    AnthropicAdapter,
+    createLLM,
+    CustomAdapter,
+    GeminiAdapter,
+    LLMError,
+    OpenAIAdapter,
+} from './direct';
+export type {
+    CreateLLMOptions,
+    LLMAdapter,
+    LLMErrorType,
+    LLMMessage,
+    LLMProviderConfig,
+    LLMProviderType,
+    LLMRequest,
+    LLMResponse,
+    LLMRole,
+    LLMStreamChunk,
+} from './direct';

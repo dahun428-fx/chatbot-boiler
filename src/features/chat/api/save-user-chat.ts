@@ -1,8 +1,20 @@
+import camelcaseKeys from 'camelcase-keys';
+
 import { SaveUserChatResponse } from '@/entities/chat/api/SaveUserChatResponse';
-import { apiCaller } from '@/shared/api';
-import { ApiBody } from '@/shared/api/api.types';
+import { HttpClient } from '@/shared/api/http';
 import { removeEmpty } from '@/shared/lib/common';
 import { Message } from '@/shared/types/message.type';
+
+const chatApi = new HttpClient({
+  baseUrl: '/api',
+  headers: {
+    'user-token': sessionStorage.getItem('userToken') ?? '',
+  },
+  onResponse: async (response) => ({
+    ...response,
+    data: camelcaseKeys(response.data as Record<string, unknown>, { deep: true }),
+  }),
+});
 
 /**
  * 사용자가 보낸 채팅 메시지를 서버에 저장하는 API 호출 함수
@@ -19,11 +31,7 @@ export const saveToChat = async (message: Omit<Message, 'id' | 'messageKey'>) =>
     optionText: setOptionText(message),
   });
 
-  const res: SaveUserChatResponse = await apiCaller(
-    'saveUserChat',
-    undefined,
-    requestBody as ApiBody<'saveUserChat'>
-  );
+  const res = await chatApi.post<SaveUserChatResponse>('', requestBody, { params: { job: 'saveUserChat' } });
 
   return { ...res.data, id: res.data?.id ?? '' };
 };

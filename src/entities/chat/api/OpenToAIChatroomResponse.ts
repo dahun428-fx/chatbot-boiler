@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-interface, @typescript-eslint/no-empty-object-type */
 
-import { ApiBasicResponse } from '@/shared/api/api.types';
+import { ApiBasicResponse } from '@/shared/api/types';
 
 /**
  * openToAIChatroom API 응답 타입

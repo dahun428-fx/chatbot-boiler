@@ -1,8 +1,10 @@
 /**
- * LLM Provider 추상화 레이어 타입 정의
+ * LLM Direct 타입 정의
+ *
+ * OpenAI, Claude, Gemini 등 LLM API 직접 연결용
  */
 
-/** LLM 메시지 역할 */
+/** 메시지 역할 */
 export type LLMRole = 'system' | 'user' | 'assistant';
 
 /** LLM 메시지 */
@@ -11,12 +13,13 @@ export interface LLMMessage {
     content: string;
 }
 
-/** LLM 요청 파라미터 */
+/** LLM 요청 */
 export interface LLMRequest {
     messages: LLMMessage[];
     model?: string;
     temperature?: number;
     maxTokens?: number;
+    topP?: number;
     stream?: boolean;
     signal?: AbortSignal;
 }
@@ -52,16 +55,17 @@ export type LLMErrorType =
 
 /** LLM 에러 */
 export class LLMError extends Error {
-    type: LLMErrorType;
-    statusCode?: number;
-    retryable: boolean;
-
-    constructor(message: string, type: LLMErrorType, statusCode?: number) {
+    constructor(
+        message: string,
+        public readonly type: LLMErrorType,
+        public readonly statusCode?: number
+    ) {
         super(message);
         this.name = 'LLMError';
-        this.type = type;
-        this.statusCode = statusCode;
-        this.retryable = ['rate_limit', 'network_error', 'timeout'].includes(type);
+    }
+
+    get isRetryable(): boolean {
+        return ['rate_limit', 'network_error', 'timeout'].includes(this.type);
     }
 }
 
@@ -75,12 +79,15 @@ export interface LLMProviderConfig {
 
 /** LLM Adapter 인터페이스 */
 export interface LLMAdapter {
-    /** 동기 채팅 요청 */
+    /** Provider 이름 */
+    readonly name: string;
+
+    /** 일반 채팅 요청 */
     chat(request: LLMRequest): Promise<LLMResponse>;
 
     /** 스트리밍 채팅 요청 */
     stream(request: LLMRequest): AsyncGenerator<LLMStreamChunk, void, unknown>;
-
-    /** Provider 이름 */
-    readonly name: string;
 }
+
+/** 지원하는 LLM Provider 타입 */
+export type LLMProviderType = 'openai' | 'anthropic' | 'gemini' | 'custom';

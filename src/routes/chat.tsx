@@ -54,7 +54,7 @@ const ChatPage = () => {
       if (!content.trim() || isLoading) return;
 
       if (!LLM_CONFIG.apiKey) {
-        alert('API 키가 설정되지 않았습니다. 환경변수를 확인해주세요.');
+        console.error('[LLM] API 키가 설정되지 않았습니다. VITE_LLM_API_KEY 환경변수를 확인해주세요.');
         return;
       }
 
@@ -88,8 +88,7 @@ const ChatPage = () => {
         setStreamingMessage('');
       } catch (error) {
         if ((error as Error).name !== 'AbortError') {
-          console.error('Chat error:', error);
-          alert(`오류 발생: ${(error as Error).message}`);
+          console.error('[LLM] Chat error:', error);
         }
       } finally {
         setIsLoading(false);

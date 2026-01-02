@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  -ms-overflow-style: none;
+  /* Internet Explorer 10+ */
+  scrollbar-width: none;
+  /* Firefox */
+  --font-body: "Pretendard Variable", "Pretendard", "Noto Sans KR",
+    system-ui, -apple-system, "Segoe UI", Roboto,
+    "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+  -ms-overflow-style: none;
+  /* Internet Explorer 10+ */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.shadow {
+  --tw-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.15);
+  --tw-shadow-colored: 0 0 5px 0 var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000),
+    var(--tw-shadow);
+}
+
+.clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  /* 원하는 줄 수로 설정 */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.body2 {
+  @apply text-body2 font-body2 leading-body2 tracking-body2;
+}
+
+.body1 {
+  @apply text-body1 font-body1 leading-body1 tracking-body1;
+}
+
+.label {
+  @apply text-label font-label leading-label tracking-label;
+}
+
+.caption {
+  @apply text-caption font-caption leading-caption tracking-caption;
+}
+
+.scroll-container {
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE 10+ */
+}
+
+.scroll-container::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
+}
+
+/* IE/Edge */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* Firefox */
+  scrollbar-width: none;
+}
+
+/* Chrome, Safari, Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  height: 6px;
+  /* 스크롤바 높이만 설정 */
+}
+
+.scrollbar-hide::-webkit-scrollbar-track {
+  background: transparent;
+  /* 트랙은 투명 */
+}
+
+.scrollbar-hide::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  /* 엄지(thumb)도 투명 */
+}
+
+textarea[data-nosb]::-webkit-scrollbar {
+  display: none;
+}
+
+.label {
+  font-size: 16px;
+  font-weight: normal;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+  margin: 12px 0;
+  /* 위아래 마진 */
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #a3a3a3;
+  border-radius: 4px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

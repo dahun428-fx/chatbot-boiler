@@ -1,0 +1,44 @@
+{
+    "start": {
+        "employee": {
+            "greeting": "Hello {{name}}, I'm your Health AI Coach.<br><br>I've organized your comprehensive checkup results from {{visitDate}} at {{center}} by category, so you can see any abnormalities at a glance.",
+            "abnormalCount": "<br><br>🚨 Abnormal items: <strong class=\"text-original-500\">{{abnormalCount}}</strong>",
+            "cautionCount": "<br>⚠️ Items requiring attention: <strong class=\"text-original-500\">{{cautionCount}}</strong>",
+            "observationCount": "<br>👀 Items for record reference: <strong class=\"text-original-500\">{{observationCount}}</strong>",
+            "normalNote": "<br><br>All other items are normal.",
+            "choiceWithAbnormal": "Do you have any questions about the abnormal results?",
+            "choiceWithoutAbnormal": "Do you have any questions about the checkup results?"
+        },
+        "guest": {
+            "greeting": "Hello {{name}}, I'm your Health AI Coach.<br><br>I help organize health checkup results by category and make it easy to understand areas that need attention.<br>Unfortunately, there are currently no checkup results registered for {{name}} in BizCare, so the result interpretation feature is not immediately available.",
+            "features": "<br><br>However, anyone can freely use the following features 😊<br><br>🔎 <strong>Hospital Search</strong><br>📜 <strong>View Test Item Descriptions</strong><br>💡 <strong>Health Management Recommendations</strong><br><br>Please select what you're curious about or feel free to ask questions!",
+            "choice": "What would you like to know?"
+        },
+        "options": {
+            "abnormal": "View Abnormal Results",
+            "chronic": "View Chronic Disease Results"
+        },
+        "defaultInfo": {
+            "noDate": "No date information",
+            "noCenter": "No checkup center information"
+        }
+    },
+    "askAgain": {
+        "question": "Do you have any additional questions?",
+        "options": {
+            "yes": "Yes",
+            "no": "No"
+        }
+    },
+    "feedback": {
+        "alreadyDone": "If you have any questions, feel free to ask me anytime!",
+        "request": "If today's conversation was helpful, we'd appreciate a quick review 😊"
+    },
+    "end": {
+        "message": "If you have more questions, feel free to ask or click the [Go Back to Start] button to restart the conversation. 🙌",
+        "options": {
+            "restart": "Go Back to Start",
+            "finish": "Finish"
+        }
+    }
+}

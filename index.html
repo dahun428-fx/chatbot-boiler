@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <!-- 0) 빠른 폰트/리소스 연결 -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+
+  <!-- Naver Maps API - DNS 조회만 미리 수행 (스크립트는 필요 시 로드) -->
+  <link rel="preconnect" href="https://oapi.map.naver.com">
+  <link rel="dns-prefetch" href="//oapi.map.naver.com">
+
+  <!-- 1) 최소 크리티컬 CSS 인라인: 시스템 폰트로 먼저 렌더 -->
+  <style>
+    /* 위폴드용 최소 스타일만: 폰트 스택과 기본 색/배경 등 */
+    html {
+      font-family: var(--font-body);
+    }
+
+    body {
+      margin: 0;
+    }
+
+    #root {
+      min-height: 100vh;
+    }
+  </style>
+
+  <!-- Static Regular만 예시. 필요한 굵기만 최소화해서 로드 -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
+  <link rel="preload" as="style"
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css"
+    crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript>
+    <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css"
+      crossorigin="anonymous" />
+  </noscript>
+
+  <!-- 3) 파비콘 등 부수 리소스 -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+  <!-- 4) 뷰포트/타이틀 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>나만의 건강 AI코치</title>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <!-- 5) ESM 모듈 스크립트는 기본 defer라 별도 변경 불필요 -->
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>

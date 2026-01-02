@@ -1,0 +1,20 @@
+{
+  "welcome": "My Health AI Coach에 오신 것을 환영합니다!",
+  "change_language": "언어 변경",
+  "korean": "한국어",
+  "english": "영어",
+  "select": "선택",
+  "selectedItem": "선택한 항목",
+  "confirm": "확인",
+  "scoreBand": {
+    "insufficient": "미흡",
+    "normal": "보통",
+    "excellent": "우수",
+    "outstanding": "최우수"
+  },
+  "chart": {
+    "evaluationLabel": "평가",
+    "myPosition": "내 위치",
+    "peerAverage": "또래 평균"
+  }
+}

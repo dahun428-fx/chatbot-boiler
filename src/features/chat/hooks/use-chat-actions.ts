@@ -9,11 +9,10 @@ import { useRecoilCallback, useResetRecoilState, useSetRecoilState } from 'recoi
 
 import { errorState, isLoadingState, messagesState, streamingContentState } from '../atom';
 import { chatService, isStreamingMode } from '../services';
-import type { ChatError } from '../types/error';
+import type { ChatActions } from '../types';
 import { createChatError } from '../types/error';
 import type { Message } from '../types/message';
 import { createMessage } from '../types/message';
-import type { ChatActions } from '../types';
 
 /**
  * 채팅 액션 훅

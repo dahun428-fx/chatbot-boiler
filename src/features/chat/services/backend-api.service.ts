@@ -95,18 +95,19 @@ export class BackendAPIService implements ChatService {
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
             let fullContent = '';
+            let streamDone = false;
 
-            while (true) {
+            while (!streamDone) {
                 const { done, value } = await reader.read();
 
                 if (done) {
                     onChunk({ content: fullContent, done: true });
-                    break;
+                    streamDone = true;
+                } else {
+                    const chunk = decoder.decode(value, { stream: true });
+                    fullContent += this.parseStreamChunk(chunk);
+                    onChunk({ content: fullContent, done: false });
                 }
-
-                const chunk = decoder.decode(value, { stream: true });
-                fullContent += this.parseStreamChunk(chunk);
-                onChunk({ content: fullContent, done: false });
             }
 
             return fullContent;

@@ -21,6 +21,7 @@ export type { LLMMessage, LLMProviderType } from '@/shared/api/llm/direct/types'
 export interface LLMConfig {
     provider: import('@/shared/api/llm/direct/types').LLMProviderType;
     apiKey: string;
+    model?: string;
     systemPrompt: string;
 }
 

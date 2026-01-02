@@ -19,6 +19,7 @@ const loadConfig = (): ServiceConfig => ({
     backendUrl: import.meta.env.VITE_BACKEND_API_URL || undefined,
     llmProvider: import.meta.env.VITE_LLM_PROVIDER || 'openai',
     llmApiKey: import.meta.env.VITE_LLM_API_KEY || undefined,
+    llmModel: import.meta.env.VITE_LLM_MODEL || undefined,
 });
 
 /**

@@ -31,6 +31,7 @@ export class LLMAPIService implements ChatService {
             this.llm = createLLM({
                 type: (this.config.llmProvider || 'openai') as 'openai' | 'anthropic' | 'gemini',
                 apiKey: this.config.llmApiKey,
+                defaultModel: this.config.llmModel,
             });
         }
         return this.llm;

@@ -11,6 +11,7 @@ import type { LLMConfig } from '../types';
 export const getLLMConfig = (): LLMConfig => ({
     provider: (import.meta.env.VITE_LLM_PROVIDER || 'openai') as LLMProviderType,
     apiKey: import.meta.env.VITE_LLM_API_KEY || '',
+    model: import.meta.env.VITE_LLM_MODEL || undefined,
     systemPrompt: import.meta.env.VITE_SYSTEM_PROMPT || 'You are a helpful assistant.',
 });
 

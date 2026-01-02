@@ -75,4 +75,6 @@ export interface ServiceConfig {
     llmProvider?: string;
     /** LLM API Key (LLMAPI용) */
     llmApiKey?: string;
+    /** LLM Model (LLMAPI용) */
+    llmModel?: string;
 }

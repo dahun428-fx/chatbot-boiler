@@ -1,4 +1,4 @@
-import { LLMError } from '@/shared/api/llm';
+import { LLMError } from '@/shared/api/llm/direct/types';
 
 import type { FallbackProps } from './ErrorBoundary';
 
@@ -21,11 +21,12 @@ interface LLMErrorFallbackProps extends FallbackProps {
  * </ErrorBoundary>
  * ```
  */
-export function LLMErrorFallback({ error, resetError, canRetry = true }: LLMErrorFallbackProps) {
+export const LLMErrorFallback = ({ error, resetError, canRetry = true }: LLMErrorFallbackProps) => {
     const isLLMError = error instanceof LLMError;
+    const llmError = isLLMError ? error : null;
 
     const getErrorInfo = () => {
-        if (!isLLMError) {
+        if (!llmError) {
             return {
                 title: '오류가 발생했습니다',
                 description: error.message || '알 수 없는 오류가 발생했습니다.',
@@ -34,7 +35,7 @@ export function LLMErrorFallback({ error, resetError, canRetry = true }: LLMErro
             };
         }
 
-        switch (error.type) {
+        switch (llmError.type) {
             case 'auth_error':
                 return {
                     title: '인증 오류',
@@ -78,7 +79,7 @@ export function LLMErrorFallback({ error, resetError, canRetry = true }: LLMErro
             default:
                 return {
                     title: 'AI 서비스 오류',
-                    description: error.message || '일시적인 문제가 발생했습니다.',
+                    description: llmError.message || '일시적인 문제가 발생했습니다.',
                     icon: '🤖',
                     showRetry: true,
                 };
@@ -96,8 +97,8 @@ export function LLMErrorFallback({ error, resetError, canRetry = true }: LLMErro
                 <p className="mt-1 max-w-sm text-sm text-gray-600">{errorInfo.description}</p>
             </div>
 
-            {isLLMError && error.statusCode && (
-                <p className="text-xs text-gray-400">오류 코드: {error.statusCode}</p>
+            {llmError?.statusCode && (
+                <p className="text-xs text-gray-400">오류 코드: {llmError.statusCode}</p>
             )}
 
             {errorInfo.showRetry && (

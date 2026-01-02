@@ -4,7 +4,7 @@
  * 모달을 렌더링하는 포털 컴포넌트입니다.
  * 필요한 모달을 switch case에 추가하여 사용하세요.
  */
-import { memo, Suspense, useMemo, useCallback } from 'react';
+import { memo, Suspense, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { atom, useRecoilState } from 'recoil';
 
@@ -34,19 +34,15 @@ const ModalOutlet = memo(function ModalOutlet() {
   const root = useModalRoot();
   const [activeModal, setActiveModal] = useRecoilState(activeModalState);
 
-  const handleClose = useCallback(() => {
-    setActiveModal(null);
-  }, [setActiveModal]);
-
   const ActiveModal = useMemo(() => {
     switch (activeModal) {
       // 필요한 모달 추가
       // case 'example':
-      //   return <ExampleModal onClose={handleClose} />;
+      //   return <ExampleModal onClose={() => setActiveModal(null)} />;
       default:
         return null;
     }
-  }, [activeModal, handleClose]);
+  }, [activeModal, setActiveModal]);
 
   return createPortal(<Suspense fallback={null}>{ActiveModal}</Suspense>, root);
 });

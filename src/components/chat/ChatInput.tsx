@@ -24,9 +24,25 @@ const SendIcon = ({ fill = '#c4c4c4' }: { fill?: string }) => (
     </svg>
 );
 
+// 중지 아이콘 (my-health-ai-coach-web 원본)
+const StopIcon = () => (
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        viewBox="0 0 32 32"
+        fill="currentColor"
+    >
+        <rect width="32" height="32" rx="8" fill="currentColor" />
+        <rect x="9" y="9" width="14" height="14" rx="3" fill="white" />
+    </svg>
+);
+
 interface ChatInputProps {
     onSend: (message: string) => void;
+    onStop?: () => void;
     disabled?: boolean;
+    isLoading?: boolean;
     placeholder?: string;
 }
 
@@ -35,7 +51,9 @@ const MAX_LINES = 2;
 
 export const ChatInput = memo(function ChatInput({
     onSend,
+    onStop,
     disabled = false,
+    isLoading = false,
     placeholder = '무엇이든 물어보세요',
 }: ChatInputProps) {
     const [value, setValue] = useState('');
@@ -68,14 +86,14 @@ export const ChatInput = memo(function ChatInput({
     };
 
     const handleSubmit = useCallback(() => {
-        if (!value.trim() || disabled) return;
+        if (!value.trim() || disabled || isLoading) return;
         onSend(value.trim());
         setValue('');
         // 제출 후 높이 초기화
         if (textareaRef.current) {
             textareaRef.current.style.height = `${INPUT_MAX_HEIGHT}px`;
         }
-    }, [value, disabled, onSend]);
+    }, [value, disabled, isLoading, onSend]);
 
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -109,7 +127,7 @@ export const ChatInput = memo(function ChatInput({
                 <div
                     className={cn(
                         'relative flex min-h-[44px] flex-1 items-end gap-2 rounded-[12px] border bg-white px-4 py-2',
-                        isValid && !disabled ? 'border-[#0F75BD]' : 'border-gray-200'
+                        isValid && !disabled && !isLoading ? 'border-[#0F75BD]' : 'border-gray-200'
                     )}
                 >
                     <textarea
@@ -118,7 +136,7 @@ export const ChatInput = memo(function ChatInput({
                         onChange={handleInput}
                         onKeyDown={handleKeyDown}
                         placeholder={placeholder}
-                        disabled={disabled}
+                        disabled={disabled || isLoading}
                         rows={1}
                         autoComplete="off"
                         style={noScrollbarStyle}
@@ -129,15 +147,26 @@ export const ChatInput = memo(function ChatInput({
                             'disabled:cursor-not-allowed disabled:opacity-50'
                         )}
                     />
-                    <button
-                        type="button"
-                        onClick={handleSubmit}
-                        disabled={disabled || !isValid}
-                        className="self-end pl-[10px] disabled:cursor-not-allowed"
-                        aria-label="메시지 전송"
-                    >
-                        <SendIcon fill={isValid && !disabled ? '#0F75BD' : '#c4c4c4'} />
-                    </button>
+                    {isLoading && onStop ? (
+                        <button
+                            type="button"
+                            onClick={onStop}
+                            className="self-end pl-[10px] text-gray-400 hover:text-[#0F75BD]"
+                            aria-label="생성 중지"
+                        >
+                            <StopIcon />
+                        </button>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={handleSubmit}
+                            disabled={disabled || !isValid || isLoading}
+                            className="self-end pl-[10px] disabled:cursor-not-allowed"
+                            aria-label="메시지 전송"
+                        >
+                            <SendIcon fill={isValid && !disabled && !isLoading ? '#0F75BD' : '#c4c4c4'} />
+                        </button>
+                    )}
                 </div>
 
                 {/* 안내 문구 */}

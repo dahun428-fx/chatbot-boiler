@@ -29,6 +29,61 @@ const BotLogo = () => (
     </div>
 );
 
+// 로딩 아이콘 컴포넌트 (my-health-ai-coach-web 원본)
+const LoadingIcon = () => (
+    <div className="mb-[6px]">
+        <svg
+            width="25"
+            height="25"
+            viewBox="0 0 25 25"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="animate-spin"
+            style={{ animation: 'spin 1.8s linear infinite' }}
+        >
+            <g clipPath="url(#clip0_loading)">
+                <path
+                    d="M12.6871 6.33326C14.2068 6.33326 15.4387 5.10133 15.4387 3.58167C15.4387 2.06201 14.2068 0.830078 12.6871 0.830078C11.1675 0.830078 9.93555 2.06201 9.93555 3.58167C9.93555 5.10133 11.1675 6.33326 12.6871 6.33326Z"
+                    fill="#0F75BD"
+                />
+                <path
+                    d="M5.98401 9.10962C7.50367 9.10962 8.7356 7.8777 8.7356 6.35803C8.7356 4.83837 7.50367 3.60645 5.98401 3.60645C4.46435 3.60645 3.23242 4.83837 3.23242 6.35803C3.23242 7.8777 4.46435 9.10962 5.98401 9.10962Z"
+                    fill="#0F75BD"
+                />
+                <path
+                    d="M3.21057 15.8108C4.73023 15.8108 5.96216 14.5789 5.96216 13.0592C5.96216 11.5395 4.73023 10.3076 3.21057 10.3076C1.69091 10.3076 0.458984 11.5395 0.458984 13.0592C0.458984 14.5789 1.69091 15.8108 3.21057 15.8108Z"
+                    fill="#0F75BD"
+                />
+                <path
+                    d="M5.98401 22.5129C7.50367 22.5129 8.7356 21.281 8.7356 19.7614C8.7356 18.2417 7.50367 17.0098 5.98401 17.0098C4.46435 17.0098 3.23242 18.2417 3.23242 19.7614C3.23242 21.281 4.46435 22.5129 5.98401 22.5129Z"
+                    fill="#66A8D0"
+                />
+                <path
+                    d="M19.3899 7.27482C19.8964 7.27482 20.307 6.86418 20.307 6.35763C20.307 5.85107 19.8964 5.44043 19.3899 5.44043C18.8833 5.44043 18.4727 5.85107 18.4727 6.35763C18.4727 6.86418 18.8833 7.27482 19.3899 7.27482Z"
+                    fill="#66A8D0"
+                />
+                <path
+                    d="M22.1649 14.4352C22.9247 14.4352 23.5407 13.8192 23.5407 13.0594C23.5407 12.2996 22.9247 11.6836 22.1649 11.6836C21.405 11.6836 20.7891 12.2996 20.7891 13.0594C20.7891 13.8192 21.405 14.4352 22.1649 14.4352Z"
+                    fill="#66A8D0"
+                />
+                <path
+                    d="M19.3891 21.5955C20.4022 21.5955 21.2235 20.7743 21.2235 19.7612C21.2235 18.748 20.4022 17.9268 19.3891 17.9268C18.376 17.9268 17.5547 18.748 17.5547 19.7612C17.5547 20.7743 18.376 21.5955 19.3891 21.5955Z"
+                    fill="#CCE3F0"
+                />
+                <path
+                    d="M12.6875 24.8301C13.9539 24.8301 14.9805 23.8035 14.9805 22.5371C14.9805 21.2707 13.9539 20.2441 12.6875 20.2441C11.4211 20.2441 10.3945 21.2707 10.3945 22.5371C10.3945 23.8035 11.4211 24.8301 12.6875 24.8301Z"
+                    fill="#CCE3F0"
+                />
+            </g>
+            <defs>
+                <clipPath id="clip0_loading">
+                    <rect width="24" height="24" fill="white" transform="translate(0 0.830078)" />
+                </clipPath>
+            </defs>
+        </svg>
+    </div>
+);
+
 interface ChatMessageProps {
     message: LLMMessage;
 }
@@ -92,11 +147,10 @@ export const ChatMessageList = memo(function ChatMessageList({
             {streamingMessage && (
                 <div className="flex w-full justify-start">
                     <div className="max-w-[80%]">
-                        <BotLogo />
+                        <LoadingIcon />
                         <div className="pb-3 pt-1 text-gray-800">
                             <p className="whitespace-pre-wrap text-[16px] leading-relaxed">
                                 {streamingMessage}
-                                <span className="ml-1 inline-block h-4 w-1 animate-pulse bg-gray-500" />
                             </p>
                         </div>
                     </div>
@@ -107,15 +161,10 @@ export const ChatMessageList = memo(function ChatMessageList({
             {isLoading && !streamingMessage && (
                 <div className="flex w-full justify-start">
                     <div>
-                        <BotLogo />
-                        <div className="flex gap-1 pb-3 pt-1">
-                            <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:-0.3s]" />
-                            <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:-0.15s]" />
-                            <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400" />
-                        </div>
+                        <LoadingIcon />
                     </div>
                 </div>
             )}
         </div>
     );
-});;
+});

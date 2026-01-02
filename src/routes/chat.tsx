@@ -141,17 +141,11 @@ const ChatPage = () => {
 
       {/* 입력 영역 */}
       <div className="mx-auto w-full max-w-4xl">
-        {isLoading && (
-          <div className="flex justify-center pb-2">
-            <button
-              onClick={handleAbort}
-              className="rounded-lg bg-red-500 px-4 py-2 text-sm text-white hover:bg-red-600"
-            >
-              생성 중단
-            </button>
-          </div>
-        )}
-        <ChatInput onSend={handleSend} disabled={isLoading} />
+        <ChatInput
+          onSend={handleSend}
+          onStop={handleAbort}
+          isLoading={isLoading}
+        />
       </div>
     </div>
   );

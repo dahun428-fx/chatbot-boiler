@@ -135,44 +135,61 @@ export const useChatActions = (): ChatActions => {
     /**
      * 마지막 메시지 재시도
      *
-     * 마지막 user 메시지를 찾아서 다시 전송합니다.
-     * 에러가 있으면 에러를 초기화합니다.
+     * my-health-ai-coach-web 패턴:
+     * - 마지막 user 메시지를 찾아서 재전송
+     * - user 메시지는 유지, 에러만 초기화
+     * - send 대신 직접 API 호출 (user 메시지 중복 방지)
      */
     const retry = useRecoilCallback(
         ({ snapshot, set }) =>
             async () => {
                 const messages = await snapshot.getPromise(messagesState);
-                const error = await snapshot.getPromise(errorState);
+                const currentError = await snapshot.getPromise(errorState);
 
                 // 에러 초기화
-                if (error) {
+                if (currentError) {
                     set(errorState, null);
                 }
 
                 // 마지막 user 메시지 찾기
                 const lastUserMessage = [...messages].reverse().find((m) => m.role === 'user');
 
-                if (lastUserMessage) {
-                    // 마지막 assistant 메시지가 있다면 제거 (실패한 응답)
-                    const lastMessage = messages[messages.length - 1];
-                    if (lastMessage?.role === 'assistant') {
-                        set(
-                            messagesState,
-                            messages.filter((m) => m.id !== lastMessage.id)
-                        );
-                    }
+                if (!lastUserMessage) return;
 
-                    // 마지막 user 메시지도 제거 (재전송할 것이므로)
-                    set(
-                        messagesState,
-                        messages.filter((m) => m.id !== lastUserMessage.id)
+                // user 메시지는 유지하고, 바로 API 호출
+                set(isLoadingState, true);
+                set(streamingContentState, '');
+
+                abortControllerRef.current = new AbortController();
+
+                try {
+                    const responseContent = await chatService.sendMessage(
+                        messages, // 기존 메시지 그대로 사용
+                        (chunk) => {
+                            set(streamingContentState, chunk.content);
+                        },
+                        {
+                            streaming: isStreamingMode(),
+                            signal: abortControllerRef.current?.signal,
+                        }
                     );
 
-                    // 재전송
-                    await send(lastUserMessage.content);
+                    // 응답 메시지 추가
+                    const assistantMessage = createMessage('assistant', responseContent);
+                    set(messagesState, [...messages, assistantMessage]);
+                } catch (err) {
+                    if ((err as Error).name === 'AbortError') return;
+
+                    const chatError = createChatError(err);
+                    set(errorState, chatError);
+                    console.error('[Chat] Retry error:', err);
+                } finally {
+                    set(isLoadingState, false);
+                    set(streamingContentState, '');
+                    abortControllerRef.current = null;
                 }
             },
-        [send]
+        []
     );
 
     return {

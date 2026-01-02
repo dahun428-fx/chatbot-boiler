@@ -13,6 +13,9 @@ export { ChatInput } from './ChatInput';
 // 에러 표시
 export { ErrorDisplay } from './ErrorDisplay';
 
+// 날짜 구분선
+export { DateDivider } from './DateDivider';
+
 // 메시지 컴포넌트 (새로운 구조)
 export {
     UserMessage,

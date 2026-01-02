@@ -6,6 +6,10 @@ import { memo } from 'react';
 import type { LLMMessage } from '@/shared/api/llm/direct/types';
 import { cn } from '@/shared/lib/common';
 
+import type { Message } from '../types/message';
+
+import { DateDivider } from './DateDivider';
+
 // 봇 로고 아이콘 컴포넌트 (my-health-ai-coach-web 원본)
 const BotLogo = () => (
     <div className="mb-[6px]">
@@ -85,7 +89,7 @@ const LoadingIcon = () => (
 );
 
 interface ChatMessageProps {
-    message: LLMMessage;
+    message: Message;
 }
 
 export const ChatMessage = memo(function ChatMessage({ message }: ChatMessageProps) {
@@ -127,7 +131,7 @@ export const ChatMessage = memo(function ChatMessage({ message }: ChatMessagePro
 });
 
 interface ChatMessageListProps {
-    messages: Array<LLMMessage & { id?: string }>;
+    messages: Message[];
     streamingMessage?: string;
     isLoading?: boolean;
 }
@@ -139,9 +143,15 @@ export const ChatMessageList = memo(function ChatMessageList({
 }: ChatMessageListProps) {
     return (
         <div className="flex flex-col gap-4">
-            {messages.map((message, index) => (
-                <ChatMessage key={message.id || `msg-${index}`} message={message} />
-            ))}
+            {messages.map((message, index) => {
+                const prevMessage = index > 0 ? messages[index - 1] : null;
+                return (
+                    <div key={message.id || `msg-${index}`}>
+                        <DateDivider message={message} prevMessage={prevMessage} />
+                        <ChatMessage message={message} />
+                    </div>
+                );
+            })}
 
             {/* 스트리밍 중인 메시지 */}
             {streamingMessage && (

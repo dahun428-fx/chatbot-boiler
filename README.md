@@ -5,8 +5,10 @@ TypeScript + React 기반의 **LLM 챗봇 보일러플레이트**입니다. Vite
 ## ✨ 주요 기능
 
 - 🤖 **LLM 통합**: OpenAI, Anthropic 등 다양한 LLM Provider 어댑터 지원
+- � **ChatService 추상화**: 환경변수 기반 서비스 전환 (BackendAPI ↔ LLMAPI)
 - 💬 **실시간 스트리밍**: SSE 기반 스트리밍 응답 처리
 - 🎨 **풍부한 UI**: 마크다운 렌더링, 스트리밍 텍스트 애니메이션
+- 💾 **선택적 저장**: LocalStorage 저장 on/off
 - 📱 **반응형 디자인**: 모바일/데스크톱 지원
 - 🌐 **다국어 지원**: i18next 기반 다국어 처리
 - 🧪 **테스트 환경**: Vitest + Testing Library + Storybook
@@ -54,15 +56,34 @@ cp .env.example .env.local
 ### 필수 환경 변수
 
 ```bash
-# 앱 환경
-VITE_APP_ENV=local
+# ==============================================
+# ChatService 설정 (핵심)
+# ==============================================
+# 서비스 타입: BackendAPI | LLMAPI
+VITE_CHAT_SERVICE_TYPE=BackendAPI
 
-# API 엔드포인트
-VITE_PUBLIC_END_POINT=https://your-api-server.com
-VITE_PUBLIC_PROXY_END_POINT=https://your-proxy-server.com
+# 스트리밍 모드: true (SSE) | false (전체 응답)
+VITE_STREAMING_MODE=true
 
-# LLM API (선택 - 직접 호출 시)
-VITE_LLM_API_KEY=your-llm-api-key
+# LocalStorage 저장: true | false
+VITE_LOCALSTORAGE_SAVE=false
+
+# 타임아웃 (밀리초)
+VITE_API_TIMEOUT_MS=30000
+
+# 시스템 프롬프트
+VITE_SYSTEM_PROMPT=You are a helpful assistant.
+
+# ==============================================
+# Backend API 설정 (VITE_CHAT_SERVICE_TYPE=BackendAPI 시)
+# ==============================================
+VITE_BACKEND_API_URL=http://localhost:8000/api/chat
+
+# ==============================================
+# LLM 직접 호출 설정 (VITE_CHAT_SERVICE_TYPE=LLMAPI 시)
+# ==============================================
+VITE_LLM_PROVIDER=openai
+VITE_LLM_API_KEY=your-api-key
 VITE_LLM_MODEL=gpt-4
 ```
 
@@ -112,7 +133,75 @@ src/
 - **Feature-Sliced Design**: 기능 중심 폴더 구조
 - **렌더링**: CSR 기반, 라우트별 코드 스플리팅
 - **상태 관리**: 서버 상태(Query) ↔ 클라이언트 상태(Recoil) 분리
-- **LLM 통합**: Provider 어댑터 패턴으로 다양한 LLM 지원
+- **ChatService 추상화**: Factory 패턴으로 서비스 전환
+
+---
+
+## 🔌 ChatService 사용법
+
+### 기본 사용 (useChat 훅)
+
+```tsx
+import { useChat } from '@/features/chat';
+
+const ChatPage = () => {
+  const { messages, isLoading, streamingContent, error, send, abort, retry, clear } = useChat();
+
+  return (
+    <div>
+      {messages.map((msg) => (
+        <div key={msg.id}>{msg.content}</div>
+      ))}
+      
+      {streamingContent && <div>{streamingContent}</div>}
+      
+      {error && (
+        <button onClick={retry}>재시도</button>
+      )}
+      
+      <input onKeyDown={(e) => e.key === 'Enter' && send(e.target.value)} />
+    </div>
+  );
+};
+```
+
+### 훅 분리 사용
+
+```tsx
+// 읽기 전용 상태
+const { messages, isLoading, error } = useChatState();
+
+// 쓰기 전용 액션
+const { send, abort, clear, retry } = useChatActions();
+```
+
+### 서비스 직접 사용
+
+```tsx
+import { chatService, createChatService } from '@/features/chat';
+
+// 기본 싱글톤 사용
+const response = await chatService.sendMessage(messages, onChunk, { streaming: true });
+
+// 커스텀 설정으로 생성
+const customService = createChatService({
+  type: 'LLMAPI',
+  streaming: true,
+  llmProvider: 'anthropic',
+});
+```
+
+### 새 서비스 등록
+
+```tsx
+import { registerService } from '@/features/chat';
+
+// 커스텀 서비스 등록
+registerService('RAGService', (config) => new RAGService(config));
+
+// .env에서 사용
+// VITE_CHAT_SERVICE_TYPE=RAGService
+```
 
 ---
 
@@ -135,6 +224,19 @@ export class CustomAdapter implements LLMAdapter {
     // SSE 스트리밍 구현
   }
 }
+```
+
+### 새 메시지 렌더러 추가
+
+```tsx
+import { registerMessageRenderer } from '@/features/chat';
+
+// 이미지 메시지 렌더러
+const ImageMessage = ({ message }) => (
+  <img src={message.content} alt="uploaded" />
+);
+
+registerMessageRenderer('image', ImageMessage);
 ```
 
 ---

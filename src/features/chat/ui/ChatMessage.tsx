@@ -127,7 +127,7 @@ export const ChatMessage = memo(function ChatMessage({ message }: ChatMessagePro
 });
 
 interface ChatMessageListProps {
-    messages: LLMMessage[];
+    messages: Array<LLMMessage & { id?: string }>;
     streamingMessage?: string;
     isLoading?: boolean;
 }
@@ -140,7 +140,7 @@ export const ChatMessageList = memo(function ChatMessageList({
     return (
         <div className="flex flex-col gap-4">
             {messages.map((message, index) => (
-                <ChatMessage key={index} message={message} />
+                <ChatMessage key={message.id || `msg-${index}`} message={message} />
             ))}
 
             {/* 스트리밍 중인 메시지 */}

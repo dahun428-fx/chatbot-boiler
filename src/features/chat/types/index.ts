@@ -1,7 +1,18 @@
 /**
  * 채팅 관련 타입 정의
+ *
+ * 확장 지점: 새로운 타입 추가 시 여기에 정의 또는 별도 파일 생성 후 re-export
  */
 
+// Message 타입
+export type { Message, MessageRole, LLMRequestMessage } from './message';
+export { createMessage, generateMessageId } from './message';
+
+// Error 타입
+export type { ChatError, ChatErrorType } from './error';
+export { createChatError, getErrorDisplayMessage } from './error';
+
+// Legacy 호환용 (shared에서 가져오는 타입)
 export type { LLMMessage, LLMProviderType } from '@/shared/api/llm/direct/types';
 
 /**
@@ -14,29 +25,34 @@ export interface LLMConfig {
 }
 
 /**
- * 메시지 전송 파라미터
+ * 채팅 상태 인터페이스 (읽기 전용)
  */
-export interface SendMessageParams {
-    content: string;
+export interface ChatState {
+    /** 메시지 목록 */
+    messages: import('./message').Message[];
+    /** 로딩 중 여부 */
+    isLoading: boolean;
+    /** 스트리밍 중인 콘텐츠 */
+    streamingContent: string;
+    /** 에러 정보 */
+    error: import('./error').ChatError | null;
 }
 
 /**
- * 채팅 컨트롤러 인터페이스
+ * 채팅 액션 인터페이스 (쓰기 전용)
  */
-export interface ChatController {
+export interface ChatActions {
     /** 메시지 전송 */
-    sendMessage: (content: string) => Promise<void>;
-    /** 스트리밍 중단 */
+    send: (content: string) => Promise<void>;
+    /** 요청 중단 */
     abort: () => void;
     /** 대화 초기화 */
-    clearChat: () => void;
+    clear: () => void;
+    /** 재시도 */
+    retry: () => void;
 }
 
 /**
- * 메시지 입력 폼 상태
+ * 통합 채팅 훅 반환 타입
  */
-export interface MessageInputState {
-    value: string;
-    setValue: (value: string) => void;
-    clear: () => void;
-}
+export interface UseChat extends ChatState, ChatActions { }

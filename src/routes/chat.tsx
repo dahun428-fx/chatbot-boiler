@@ -8,16 +8,15 @@ import { createFileRoute } from '@tanstack/react-router';
 import {
   ChatInput,
   ChatMessageList,
-  useChatController,
-  useChatState,
+  ErrorDisplay,
+  useChat,
   useAutoScroll,
 } from '@/features/chat';
 
 const ChatPage = () => {
-  // 커스텀 훅으로 상태 및 로직 분리
-  const { messages, isLoading, streamingMessage, isEmpty } = useChatState();
-  const { sendMessage, abort } = useChatController();
-  const { containerRef } = useAutoScroll([messages, streamingMessage]);
+  // 통합 훅 사용
+  const { messages, isLoading, streamingContent, error, isEmpty, send, abort, retry } = useChat();
+  const { containerRef } = useAutoScroll([messages, streamingContent]);
 
   return (
     <div className="flex h-[100svh] flex-col bg-white">
@@ -43,11 +42,18 @@ const ChatPage = () => {
               </div>
             </div>
           ) : (
-            <ChatMessageList
-              messages={messages}
-              streamingMessage={streamingMessage}
-              isLoading={isLoading}
-            />
+            <>
+              <ChatMessageList
+                messages={messages}
+                streamingMessage={streamingContent}
+                isLoading={isLoading}
+              />
+              {error && (
+                <div className="mt-4">
+                  <ErrorDisplay error={error} onRetry={retry} />
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -55,7 +61,7 @@ const ChatPage = () => {
       {/* 입력 영역 */}
       <div className="mx-auto w-full max-w-4xl">
         <ChatInput
-          onSend={sendMessage}
+          onSend={send}
           onStop={abort}
           isLoading={isLoading}
         />

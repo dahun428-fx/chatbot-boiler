@@ -1,95 +1,144 @@
-# \<나만의 건강 AI 코치>
+# LLM Chatbot Boilerplate
 
-TypeScript + React 기반의 웹 애플리케이션입니다. Vite 빌드 환경과 TanStack Router/Query를 중심으로 구성하고, HeroUI/MUI/TailwindCSS로 UI를 구현합니다. ESLint/Prettier, Vitest + Testing Library로 품질을 관리합니다.
+TypeScript + React 기반의 **LLM 챗봇 보일러플레이트**입니다. Vite 빌드 환경과 TanStack Router/Query를 중심으로 구성하고, HeroUI/MUI/TailwindCSS로 UI를 구현합니다. ESLint/Prettier, Vitest + Testing Library, Storybook으로 품질을 관리합니다.
+
+## ✨ 주요 기능
+
+- 🤖 **LLM 통합**: OpenAI, Anthropic 등 다양한 LLM Provider 어댑터 지원
+- 💬 **실시간 스트리밍**: SSE 기반 스트리밍 응답 처리
+- 🎨 **풍부한 UI**: 마크다운 렌더링, 스트리밍 텍스트 애니메이션
+- 📱 **반응형 디자인**: 모바일/데스크톱 지원
+- 🌐 **다국어 지원**: i18next 기반 다국어 처리
+- 🧪 **테스트 환경**: Vitest + Testing Library + Storybook
 
 > 권장 Node: **≥ 18.18** (Vite 6 권장 범위)
 > 패키지 매니저: **Yarn 권장** (Corepack 사용 권장)
 
 ---
 
-## 빠른 시작(Quick Start)
+## 빠른 시작 (Quick Start)
 
 ```bash
-
 # 의존성 설치
 yarn install
 
-# 개발 서버
+# 개발 서버 (http://localhost:3000)
 yarn dev
 
 # 빌드 / 프리뷰
 yarn build
 yarn preview
 
-# 품질/테스트
+# 테스트
+yarn test          # watch 모드
+yarn test:run      # 1회 실행
+yarn test:coverage # 커버리지
+
+# Storybook
+yarn storybook
+
+# 린트
 yarn lint
-yarn test
 ```
 
 ---
 
-## 환경 변수(.env.local 예시)
+## 환경 변수 설정
 
-> ⚠️ **주의**: 실제 키/엔드포인트가 포함되어 있으니 `.env.local`은 저장소에 커밋하지 마세요.
-> 운영/스테이징과 로컬은 값을 분리하는 것을 권장합니다.
-> key 값 필요시 운영자에게 문의하세요.
+`.env.example`을 복사하여 `.env.local` 또는 `.env.development`를 생성하세요.
 
 ```bash
-# 공통
+cp .env.example .env.local
+```
+
+### 필수 환경 변수
+
+```bash
+# 앱 환경
 VITE_APP_ENV=local
 
-# 네이버 지도
-VITE_NAVER_MAP_CLIENT_ID=
+# API 엔드포인트
+VITE_PUBLIC_END_POINT=https://your-api-server.com
+VITE_PUBLIC_PROXY_END_POINT=https://your-proxy-server.com
 
-# 백엔드 엔드포인트
-VITE_PUBLIC_END_POINT=
+# LLM API (선택 - 직접 호출 시)
+VITE_LLM_API_KEY=your-llm-api-key
+VITE_LLM_MODEL=gpt-4
+```
 
-# 하이닥 연동
-VITE_PUBLIC_HIDOC_END_POINT=
-VITE_PUBLIC_HIDOC_API_KEY=
+> ⚠️ **주의**: `.env.local`은 절대 Git에 커밋하지 마세요!
 
-# 스토리지 키
-VITE_PUBLIC_USER_TOKEN_KEY=
-VITE_PUBLIC_CHAT_ROOM_ID=
+---
 
-# 바로케어 마이페이지(결과 리스트)
-VITE_PUBLIC_BACARE_MYRESULT_LIST_URL=
+## 기술 스택
 
+| 카테고리 | 기술 |
+|---------|------|
+| **언어/런타임** | TypeScript 5, React 18 |
+| **번들러** | Vite 6 + vite-tsconfig-paths |
+| **라우팅** | TanStack Router 1 |
+| **데이터 패칭** | TanStack Query 5 |
+| **상태관리** | Recoil 0.7 |
+| **폼/검증** | React Hook Form 7, Zod 3 |
+| **UI/스타일** | HeroUI, MUI v6, TailwindCSS 3, Emotion |
+| **테스트** | Vitest, Testing Library, Storybook |
+| **품질** | ESLint, Prettier |
+
+---
+
+## 프로젝트 구조
+
+```
+src/
+├── entities/          # 도메인 엔티티 (chat, message-set)
+├── features/          # 기능 단위 모듈 (chat, layout)
+├── routes/            # 페이지 라우트
+├── shared/            # 공유 모듈
+│   ├── api/           # API 클라이언트, LLM 어댑터
+│   ├── constants/     # 상수, enum
+│   ├── context/       # React Context
+│   ├── hooks/         # 공용 훅
+│   ├── lib/           # 유틸리티
+│   ├── types/         # 타입 정의
+│   └── ui/            # UI 컴포넌트
+├── styles/            # 전역 스타일
+└── ui/                # 레이아웃 컴포넌트
 ```
 
 ---
 
-## 기술 스택(요약)
+## 아키텍처
 
-- **언어/런타임**: TypeScript 5 (타입스크립트), React 18 (리액트)
-- **번들러/Dev 서버**: Vite 6 (바이트) + `vite-tsconfig-paths`
-- **라우팅**: TanStack Router 1 (탠스택 라우터, DevTools 포함)
-- **데이터 패칭/캐시**: TanStack Query 5 (탠스택 쿼리)
-- **상태관리**: Recoil 0.7 (리코일)
-- **폼/검증**: React Hook Form 7, Zod 3 + `@hookform/resolvers`
-- **UI/스타일링**: HeroUI(NextUI v2 계열), MUI v6, Emotion, TailwindCSS 3
-- **테스트**: Vitest 3, Testing Library(+ `jest-dom`), `jsdom`
-- **품질**: ESLint(Airbnb + TS + Prettier + react-hooks + query), Prettier
+- **Feature-Sliced Design**: 기능 중심 폴더 구조
+- **렌더링**: CSR 기반, 라우트별 코드 스플리팅
+- **상태 관리**: 서버 상태(Query) ↔ 클라이언트 상태(Recoil) 분리
+- **LLM 통합**: Provider 어댑터 패턴으로 다양한 LLM 지원
 
 ---
 
-## 아키텍처(간략)
+## 확장 가이드
 
-- **렌더링 전략**: CSR 우선. 최초 진입 시 핵심 데이터만 프리패치(TanStack Router loader / Query prefetch)
-- **상태 경계**: **서버 상태(Query)** ↔ **클라이언트 상태(Recoil)** 명확 구분
-- **스타일 가이드**: Tailwind 토큰화, Emotion 테마 일원화, HeroUI 기본 + MUI 특수 컴포넌트 한정
+### 새 LLM Provider 추가
 
----
+`src/shared/api/llm/adapters/`에 새 어댑터 생성:
 
-## 테스트/품질 & 배포
+```typescript
+// CustomAdapter.ts
+import { LLMAdapter, LLMRequest, LLMResponse } from '../types';
 
-- **Web Vitals 목표**: LCP < 2.5s, INP < 200ms, CLS < 0.1
-- **번들 예산**: 초기 JS < 200KB gzip(라우트 단위 코드 스플리팅)
-- **빌드**: `yarn build` (내부 `tsc -b && vite build`)
-- **릴리스 노트**: 변경 요약 + 핵심 성능 지표 포함
+export class CustomAdapter implements LLMAdapter {
+  async chat(request: LLMRequest): Promise<LLMResponse> {
+    // 구현
+  }
+  
+  async *stream(request: LLMRequest): AsyncGenerator<string> {
+    // SSE 스트리밍 구현
+  }
+}
+```
 
 ---
 
 ## 라이선스
 
-다나아데이터
+MIT License

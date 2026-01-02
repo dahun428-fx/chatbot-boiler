@@ -15,7 +15,6 @@ export enum SenderType {
  * - default: 기본 옵션(가로)
  * - defaultVertical: 기본 옵션(세로)
  * - defaultHorizontal: 기본 옵션(가로)
- * - hospital: 병원 추천
  * - content: 컨텐츠
  * - faq: FAQ
  * - star: 만족도 조사
@@ -23,7 +22,6 @@ export enum SenderType {
  * - chatFinished: 채팅 종료
  * - summery: 요약
  * - modal: 모달
- * - addressSelectDrawer: 주소 선택 드로어
  * - document: 문서
  * - error: 에러
  */
@@ -34,8 +32,6 @@ export enum AnswerType {
   defaultVertical = '1',
   /** 기본 옵션(가로) */
   defaultHorizontal = '12',
-  /** 병원 추천 */
-  hospital = '2',
   /** 컨텐츠 */
   content = '3',
   /** FAQ */
@@ -50,30 +46,22 @@ export enum AnswerType {
   summery = '8',
   /** 모달 */
   modal = '9',
-  /** 주소 선택 드로어 */
-  addressSelectDrawer = '10',
   /** 문서 */
   document = '11',
   /** 에러 */
   error = '13',
+  /** LLM 에러 */
   llmError = '14',
-  /** FAQ 카드 (검사항목 설명) */
+  /** FAQ 카드 */
   faqCard = '15',
 }
 
 /**
  * 만족도 조사 유형
- * - hospital: 병원 만족도
- * - detail: 상세 만족도
- * - customHealthcare: 맞춤 건강 관리 만족도
  */
 export enum SatisfactionType {
-  /** 병원 만족도 */
-  hospital = '1',
   /** 상세 만족도 */
   detail = '2',
-  /** 맞춤 건강 관리 만족도 */
-  customHealthcare = '3',
 }
 
 export enum MessageType {
@@ -86,7 +74,6 @@ export enum MessageType {
 export enum OptionTextType {
   CommonAnswer = 1,
   DefaultAnswerText = 2,
-  HospitalsAnswer = 3,
   ContentAnswer = 4,
   FAQAnswer = 5,
   LLMAnswer = 6,
